@@ -3,7 +3,7 @@
 > North star: turn a library of one-shot skills into composable, resumable,
 > artifact-audited pipelines — walkable by hand in a conversation today, driven unattended
 > by a control plane tomorrow.
-> Source: VISION.md (v1.1) · _Last updated: 2026-08-06 · Plan version: v1_
+> Source: VISION.md (v1.1) · _Last updated: 2026-08-06 · Plan version: v2_
 
 ## Alignment anchors (every goal must serve these)
 
@@ -34,15 +34,15 @@ covered by passing tests. This is Spec 1 (`docs/superpowers/specs/
 its execution.
 **Status:** in-progress
 **Sub-goals:**
-- [ ] **1a** Implement `Flow.step()` (extract `_run_one_stage` helper; `run()` unchanged
+- [x] **1a** Implement `Flow.step()` (extract `_run_one_stage` helper; `run()` unchanged
   behavior) — _advances:_ gives LoopX a single-stage execution primitive — _accept:_ new
   `test_flow.py` cases pass, existing ones pass unmodified.
-- [ ] **1b** Implement `LoopXRunner` + `TickResult` + `LoopXNotInstalledError` in new
+- [x] **1b** Implement `LoopXRunner` + `TickResult` + `LoopXNotInstalledError` in new
   `src/alphalayer/loopx.py` — _advances:_ implements the documented LoopX "Direct CLI
   orchestration" tick sequence — _accept:_ fake-`loopx`-binary test suite covers
   should-run=false short-circuit, happy path, last-stage-completes, already-complete flow,
   missing binary.
-- [ ] **1c** Implement `alphalayer loopx-tick` CLI subcommand — _advances:_ the actual
+- [x] **1c** Implement `alphalayer loopx-tick` CLI subcommand — _advances:_ the actual
   integration surface a runner (Claude Code `/loop`, cron, Codexia) invokes — _accept:_
   `test_cli.py` case passes; exit codes match the spec's contract.
 - [ ] **1d** Verify real `loopx todo claim/update/complete` flag names against a live
@@ -162,5 +162,8 @@ sub-goal left to trigger a re-check.
 
 ## Changelog
 
+- 2026-08-06 v2 — Sub-goals 1a–1c shipped (Flow.step(), LoopXRunner, alphalayer
+  loopx-tick, all with passing tests; 47/47 suite green, ruff + mypy strict clean). 1d/1e
+  need a live LoopX install and remain open — see Sequencing.
 - 2026-08-06 v1 — Initial cascade from VISION.md v1.1. Goal 1 (Spec 1 execution) starts
   immediately; Goal 3 (docs/package sync) runs as a background loop alongside it.

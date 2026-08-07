@@ -50,6 +50,7 @@ def _run_loopx(*args: str) -> dict[str, Any]:
         ["loopx", "--format", "json", *args],
         capture_output=True,
         text=True,
+        check=False,
     )
     if result.returncode != 0:
         raise RuntimeError(
