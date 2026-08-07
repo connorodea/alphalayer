@@ -10,6 +10,7 @@ from pathlib import Path
 
 from .artifact import Artifact
 from .flow import Flow
+from .loopx import LoopXRunner
 
 
 def _load_flow(spec: str) -> Flow:
@@ -49,6 +50,30 @@ def cmd_inspect(args: argparse.Namespace) -> None:
             f"[{artifact.stage}] {artifact.layer} -> schema={artifact.schema} "
             f"upstream={artifact.upstream} ({path.name})"
         )
+
+
+def cmd_loopx_tick(args: argparse.Namespace) -> None:
+    flow = _load_flow(args.flow)
+    seed = [Artifact.load(Path(p)) for p in (args.seed or [])]
+    runner = LoopXRunner(flow, goal_id=args.goal_id, agent_id=args.agent_id)
+    result = runner.tick(*seed)
+
+    if not result.ran:
+        print(f"{flow.name}: not runnable ({result.reason or 'should-run said no'})")
+        return
+
+    if result.artifact is None:
+        print(f"{flow.name}: already complete, no stage executed")
+    else:
+        where = result.artifact.path if result.artifact.path else "(in-memory only)"
+        print(
+            f"{flow.name}: [{result.artifact.stage}] {result.artifact.layer} -> "
+            f"{result.artifact.schema}  {where}"
+        )
+    if result.flow_complete:
+        print(f"{flow.name}: flow complete")
+    if result.scheduler_hint:
+        print(f"{flow.name}: scheduler hint -> {result.scheduler_hint}")
 
 
 _LAYER_STUB = '''"""{name} — an AlphaLayer Layer."""
@@ -125,6 +150,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_inspect = sub.add_parser("inspect", help="list a Flow run's artifacts")
     p_inspect.add_argument("flow_dir", help="path to a Flow's artifact directory")
     p_inspect.set_defaults(func=cmd_inspect)
+
+    p_tick = sub.add_parser("loopx-tick", help="advance a Flow one stage via a LoopX tick")
+    p_tick.add_argument("flow", help="module:attribute pointing at a Flow instance")
+    p_tick.add_argument("--goal-id", required=True, help="the LoopX goal id to tick against")
+    p_tick.add_argument("--agent-id", default="alphalayer", help="the LoopX agent id to tick as")
+    p_tick.add_argument("--seed", action="append", help="path to a seed Artifact (repeatable)")
+    p_tick.set_defaults(func=cmd_loopx_tick)
 
     p_layer = sub.add_parser("new-layer", help="scaffold a new Layer module")
     p_layer.add_argument("name")

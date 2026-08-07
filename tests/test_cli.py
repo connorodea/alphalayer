@@ -55,3 +55,39 @@ def test_run_and_inspect_round_trip(tmp_path, monkeypatch, capsys) -> None:
 def test_parser_requires_a_subcommand() -> None:
     parser = build_parser()
     assert parser.prog == "alphalayer"
+
+
+def test_loopx_tick_runs_one_stage(tmp_path, monkeypatch, capsys, fake_loopx) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("FAKE_LOOPX_TODO_ID", "todo-1")
+    (tmp_path / "myflows.py").write_text(
+        "from alphalayer import Artifact, Skill, Flow\n"
+        "class Seed(Skill):\n"
+        "    def run(self, *inputs):\n"
+        "        return Artifact(layer=self.name, schema='raw-v1', content='hi')\n"
+        "flow = Flow('tick-test') | Seed()\n"
+    )
+
+    main(["loopx-tick", "myflows:flow", "--goal-id", "g1"])
+
+    out = capsys.readouterr().out
+    assert "[0] Seed -> raw-v1" in out
+    assert "flow complete" in out
+
+
+def test_loopx_tick_reports_when_not_runnable(tmp_path, monkeypatch, capsys, fake_loopx) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("FAKE_LOOPX_SHOULD_RUN", "false")
+    monkeypatch.setenv("FAKE_LOOPX_REASON", "quiet")
+    (tmp_path / "myflows.py").write_text(
+        "from alphalayer import Artifact, Skill, Flow\n"
+        "class Seed(Skill):\n"
+        "    def run(self, *inputs):\n"
+        "        return Artifact(layer=self.name, schema='raw-v1', content='hi')\n"
+        "flow = Flow('tick-test-2') | Seed()\n"
+    )
+
+    main(["loopx-tick", "myflows:flow", "--goal-id", "g1"])
+
+    out = capsys.readouterr().out
+    assert "not runnable (quiet)" in out
