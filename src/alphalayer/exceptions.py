@@ -21,3 +21,8 @@ class AmbiguousArtifactError(AlphaLayerError):
 
 class SchemaMismatchError(AlphaLayerError):
     """A Layer's declared `consumes_schema` wasn't present among the artifacts handed to it."""
+
+
+class LoopXNotInstalledError(AlphaLayerError):
+    """The `loopx` binary isn't on PATH — LoopXRunner needs it to tick a Flow forward
+    against a real LoopX goal."""

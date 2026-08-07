@@ -25,10 +25,12 @@ from .exceptions import (
     AlphaLayerError,
     AmbiguousArtifactError,
     ArtifactNotFoundError,
+    LoopXNotInstalledError,
     SchemaMismatchError,
 )
 from .flow import Flow
 from .layer import Layer, layer
+from .loopx import LoopXRunner, TickResult
 from .skill import Skill, skill
 
 __version__ = "0.1.0"
@@ -43,9 +45,12 @@ __all__ = [
     "Flow",
     "LLMSkill",
     "Layer",
+    "LoopXNotInstalledError",
+    "LoopXRunner",
     "OpenAIBackend",
     "SchemaMismatchError",
     "Skill",
+    "TickResult",
     "__version__",
     "layer",
     "skill",
