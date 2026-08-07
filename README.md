@@ -93,7 +93,16 @@ alphalayer new-flow my-pipeline                                     # scaffold a
 alphalayer run my_flows.digest:flow                                 # run a Flow (module:attribute)
 alphalayer run my_flows.digest:flow --resume                        # skip already-completed stages
 alphalayer inspect docs/flows/weekly-digest                         # list a run's artifacts
+alphalayer loopx-tick my_flows.digest:flow --goal-id my-goal         # advance one stage, gated by LoopX
 ```
+
+`loopx-tick` advances a Flow one stage per call, gated by a
+[LoopX](https://github.com/connorodea/loopx) goal — `quota should-run` decides whether to
+act, and the tick claims a todo, runs `Flow.step()`, writes back compact evidence, and
+spends quota, so a Flow can run unattended across days under an external scheduler (a
+cron job, Claude Code's native `/loop`, or any host that wakes this command once per
+tick). See `docs/superpowers/specs/2026-08-06-loopx-integration-design.md` and
+`VISION.md` for the design and roadmap.
 
 ## Design notes
 
