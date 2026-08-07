@@ -248,14 +248,14 @@ import json
 import os
 import sys
 
-log_path = os.environ.get("FAKE_LOOPX_LOG")
-if log_path:
-    with open(log_path, "a") as f:
-        f.write(" ".join(sys.argv[1:]) + "\\n")
-
 args = sys.argv[1:]
 if args[:2] == ["--format", "json"]:
     args = args[2:]
+
+log_path = os.environ.get("FAKE_LOOPX_LOG")
+if log_path:
+    with open(log_path, "a") as f:
+        f.write(" ".join(args) + "\\n")
 
 fail_on = os.environ.get("FAKE_LOOPX_FAIL_ON")
 if fail_on and fail_on in args:
